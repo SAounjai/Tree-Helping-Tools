@@ -1,0 +1,36 @@
+Sub AddConfirmation()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim i As Long
+    Dim mtId As String
+    
+    ' Assuming your data starts from row 2
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your sheet name
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    
+    ' Sort data based on mt_id, autopropose, and matching
+    ws.Sort.SortFields.Clear
+    ws.Sort.SortFields.Add2 Key:=Range("A2:A" & lastRow), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    ws.Sort.SortFields.Add2 Key:=Range("J2:J" & lastRow), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    ws.Sort.SortFields.Add2 Key:=Range("M2:M" & lastRow), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ws.Sort
+        .SetRange ws.Range("A1:M" & lastRow)
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+    ' Loop through each row
+    For i = 2 To lastRow
+        If ws.Cells(i, "J").Value = "select" And ws.Cells(i, "M").Value = "match" Then
+            ' Check if it's the first occurrence of mt_id
+            If ws.Cells(i, "A").Value <> mtId Then
+                mtId = ws.Cells(i, "A").Value
+                ' Add "confirm" in column N
+                ws.Cells(i, "N").Value = "confirm"
+            End If
+        End If
+    Next i
+End Sub
